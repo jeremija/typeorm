@@ -9,7 +9,7 @@ describe("github issues > 2737 mariadb driver wants to recreate create/update da
     before(async () => connections = await createTestingConnections({
         // logging: true,
         entities: [__dirname + "/entity/*{.js,.ts}"],
-        enabledDrivers: ["mariadb"]
+        enabledDrivers: ["mysql", "mariadb"]
     }));
     beforeEach(() => reloadTestingDatabases(connections));
     after(() => closeTestingConnections(connections));
