@@ -52,6 +52,7 @@
     "@types/mocha": "^5.2.6",
     "@types/node": "^9.6.0",
     "@types/rimraf": "^2.0.2",
+    "@types/semver": "^6.0.2",
     "@types/sinon": "^7.0.8",
     "@types/source-map-support": "^0.4.2",
     "@types/yargs": "^12.0.9",
@@ -89,8 +90,8 @@
     "sqlite3": "^4.0.9",
     "ts-node": "^8.0.2",
     "tslint": "^5.13.1",
-    "typescript": "^3.3.3333",
-    "typeorm-aurora-data-api-driver": "^1.1.1"
+    "typeorm-aurora-data-api-driver": "^1.1.1",
+    "typescript": "^3.3.3333"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
@@ -103,6 +104,7 @@
     "js-yaml": "^3.13.1",
     "mkdirp": "^0.5.1",
     "reflect-metadata": "^0.1.13",
+    "semver": "^6.3.0",
     "tslib": "^1.9.0",
     "xml2js": "^0.4.17",
     "yargonaut": "^1.1.2",

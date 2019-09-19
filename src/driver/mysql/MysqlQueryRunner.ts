@@ -21,6 +21,7 @@ import {ColumnType, PromiseUtils} from "../../index";
 import {TableCheck} from "../../schema-builder/table/TableCheck";
 import {IsolationLevel} from "../types/IsolationLevel";
 import {TableExclusion} from "../../schema-builder/table/TableExclusion";
+import * as semver from "semver";
 
 /**
  * Runs queries on a single mysql database connection.
@@ -1243,6 +1244,7 @@ export class MysqlQueryRunner extends BaseQueryRunner implements QueryRunner {
             return [];
 
         const isMariaDb = this.driver.options.type === "mariadb";
+        const dbVersion = await this.getVersion();
 
         // create tables for loaded tables
         return Promise.all(dbTables.map(async dbTable => {
@@ -1291,7 +1293,12 @@ export class MysqlQueryRunner extends BaseQueryRunner implements QueryRunner {
                         tableColumn.default = undefined;
 
                     } else {
-                        tableColumn.default = dbColumn["COLUMN_DEFAULT"] === "CURRENT_TIMESTAMP" ? dbColumn["COLUMN_DEFAULT"] : `'${dbColumn["COLUMN_DEFAULT"]}'`;
+                        if (isMariaDb && semver.gte(dbVersion, "10.2.7")) {
+                            const isLiteral = /^'.*'$/.test(dbColumn["COLUMN_DEFAULT"]);
+                            tableColumn.default = isLiteral ? dbColumn["COLUMN_DEFAULT"] : dbColumn["COLUMN_DEFAULT"].toUpperCase();
+                        } else {
+                            tableColumn.default = dbColumn["COLUMN_DEFAULT"] === "CURRENT_TIMESTAMP" ? dbColumn["COLUMN_DEFAULT"] : `'${dbColumn["COLUMN_DEFAULT"]}'`;
+                        }
                     }
 
                     if (dbColumn["EXTRA"].indexOf("on update") !== -1) {
@@ -1657,6 +1664,12 @@ export class MysqlQueryRunner extends BaseQueryRunner implements QueryRunner {
             c += ` ON UPDATE ${column.onUpdate}`;
 
         return c;
+    }
+
+    protected async getVersion(): Promise<string> {
+        const result = await this.query(`SELECT VERSION() AS \`version\``);
+        const semVer = semver.coerce(result[0]["version"]);
+        return semVer ? semVer.version : "0.0.0";
     }
 
 }
